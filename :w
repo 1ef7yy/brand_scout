@@ -1,0 +1,31 @@
+package view
+
+import (
+	"net/http"
+
+	"github.com/1ef7yy/brand_scout/internal/models"
+)
+
+
+func (v *View) CreateQuote(w http.ResponseWriter, r *http.Request) {
+}
+func (v *View) GetQuotes(w http.ResponseWriter, r *http.Request) {
+	authorQuery := r.URL.Query().Get("author")
+
+
+	quotes, err := v.domain.GetQuotes(r.Context(), authorQuery)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if quotes == nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+}
+func (v *View) GetRandomQuote(w http.ResponseWriter, r *http.Request) {
+}
+func (v *View) DeleteQuoteByID(w http.ResponseWriter, r *http.Request) {
+}
