@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	customErrors "github.com/1ef7yy/brand_scout/internal/errors"
 	"github.com/1ef7yy/brand_scout/internal/models"
 )
 
@@ -16,8 +17,6 @@ func (v *View) CreateQuote(w http.ResponseWriter, r *http.Request) {
 		v.log.Errorf("error scanning JSON into struct: %s", err.Error())
 		return
 	}
-
-	v.log.Debugf("req body: %+v", createReq)
 
 	quote, err := v.domain.CreateQuote(r.Context(), createReq)
 	if err != nil {
@@ -44,7 +43,6 @@ func (v *View) CreateQuote(w http.ResponseWriter, r *http.Request) {
 func (v *View) GetQuotes(w http.ResponseWriter, r *http.Request) {
 	authorQuery := r.URL.Query().Get("author")
 
-	v.log.Debugf("authorQuery: %s", authorQuery)
 	quotes, err := v.domain.GetQuotes(r.Context(), authorQuery)
 
 	if err != nil {
@@ -80,6 +78,11 @@ func (v *View) GetRandomQuote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if quote.ID == 0 {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
 	resp, err := json.Marshal(quote)
 	if err != nil {
 		v.log.Errorf("error marshalling struct: %s", err.Error())
@@ -97,10 +100,34 @@ func (v *View) GetRandomQuote(w http.ResponseWriter, r *http.Request) {
 func (v *View) DeleteQuoteByID(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 
-	err := v.domain.DeleteQuoteByID(r.Context(), id)
+	deletedID, err := v.domain.DeleteQuoteByID(r.Context(), id)
+	if err == customErrors.ErrNotFound {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
 	if err != nil {
 		v.log.Errorf("error deleting quote: %s", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if deletedID == "" {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	resp, err := json.Marshal(deletedID)
+
+
+	if err != nil {
+		v.log.Errorf("error deleting quote by id %s: %s", id, err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	_, err = w.Write(resp)
+	if err != nil {
+		v.log.Errorf("error writing to client: %s", err.Error())
 		return
 	}
 }

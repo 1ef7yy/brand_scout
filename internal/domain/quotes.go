@@ -40,9 +40,14 @@ func (d *Domain) GetRandomQuote(ctx context.Context) (models.Quote, error) {
 	if err != nil {
 		d.log.Errorf("error getting random quote: %s", err.Error())
 	}
-
 	return quote, err
 }
-func (d *Domain) DeleteQuoteByID(context.Context, string) error {
-	return nil
+func (d *Domain) DeleteQuoteByID(ctx context.Context, id string) (string, error) {
+	deletedID, err := d.db.DeleteQuoteByID(ctx, id)
+	if err != nil {
+		d.log.Errorf("error deleting quote by id %s: %s", id, err.Error())
+		return "", err
+	}
+
+	return deletedID, nil
 }

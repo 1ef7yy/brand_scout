@@ -17,11 +17,10 @@ type DomainIFace interface {
 	CreateQuote(ctx context.Context, createReq models.CreateQuoteDTO) (quote models.Quote, err error)
 	GetQuotes(ctx context.Context, author string) ([]models.Quote, error)
 	GetRandomQuote(context.Context) (models.Quote, error)
-	DeleteQuoteByID(context.Context, string) error
+	DeleteQuoteByID(context.Context, string) (string, error)
 }
 
 func NewDomain(log logger.Logger) (DomainIFace, error) {
-	log.Debugf("new domain")
 	db, err := db.New(log)
 	if err != nil {
 		log.Errorf("error creating db instance: %s", err.Error())

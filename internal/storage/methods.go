@@ -2,7 +2,11 @@ package db
 
 import (
 	"context"
+	"database/sql"
+	"errors"
+	"fmt"
 
+	customErrors "github.com/1ef7yy/brand_scout/internal/errors"
 	"github.com/1ef7yy/brand_scout/internal/models"
 )
 
@@ -97,5 +101,23 @@ func (d *DB) GetRandomQuote(ctx context.Context) (models.Quote, error) {
 
 
 func (d *DB) DeleteQuoteByID(ctx context.Context, id string) (string, error) {
-	return "", nil
+	query := `
+	DELETE FROM quotes
+	WHERE id = $1
+	RETURNING id
+	`
+
+	var deletedID string
+	err := d.db.QueryRowContext(ctx, query, id).Scan(&deletedID)
+
+
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return "", customErrors.ErrNotFound
+		}
+
+		return "", fmt.Errorf("error deleting quote by id: %s", err.Error())
+	}
+
+	return deletedID, nil
 }
