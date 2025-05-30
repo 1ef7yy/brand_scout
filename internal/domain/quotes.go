@@ -6,15 +6,43 @@ import (
 	"github.com/1ef7yy/brand_scout/internal/models"
 )
 
-func (d Domain) CreateQuote(ctx context.Context, author, text string) (quote models.Quote, err error) {
-	return models.Quote{}, nil
+func (d *Domain) CreateQuote(ctx context.Context, req models.CreateQuoteDTO) (models.Quote, error) {
+	quote, err := d.db.CreateQuote(ctx, req)
+	if err != nil {
+		d.log.Errorf("error creating quote: %s", err.Error())
+		return models.Quote{}, err
+	}
+
+	return quote, nil
 }
-func (d Domain) GetQuotes(ctx context.Context, author string) ([]models.Quote, error) {
-	return []models.Quote{}, nil
+func (d *Domain) GetQuotes(ctx context.Context, author string) ([]models.Quote, error) {
+	if author == "" {
+		quotes, err := d.db.GetAllQuotes(ctx)
+
+		if err != nil {
+			d.log.Errorf("error getting all quotes: %s", err.Error())
+			return nil, err
+		}
+		return quotes, nil
+	} else {
+		quotes, err := d.db.GetAuthorQuotes(ctx, author)
+		if err != nil {
+			d.log.Errorf("error getting author %s quotes: %s", author, err.Error())
+			return nil, err
+		}
+		return quotes, nil
+	}
 }
-func (d Domain) GetRandomQuote(context.Context) (models.Quote, error) {
-	return models.Quote{}, nil
+func (d *Domain) GetRandomQuote(ctx context.Context) (models.Quote, error) {
+	quote, err := d.db.GetRandomQuote(ctx)
+
+
+	if err != nil {
+		d.log.Errorf("error getting random quote: %s", err.Error())
+	}
+
+	return quote, err
 }
-func (d Domain) DeleteQuoteByID(context.Context, string) error {
+func (d *Domain) DeleteQuoteByID(context.Context, string) error {
 	return nil
 }

@@ -20,7 +20,14 @@ type ViewIFace interface {
 }
 
 func NewView(log logger.Logger) (ViewIFace, error) {
-	return View{
+	log.Debugf("new view")
+	domain, err := domain.NewDomain(log)
+	if err != nil {
+		log.Errorf("error creating domain: %s", err.Error())
+		return nil, err
+	}
+	return &View{
 		log: log,
+		domain: domain,
 	}, nil
 }
