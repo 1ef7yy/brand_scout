@@ -10,7 +10,7 @@ import (
 
 type Domain struct {
 	log logger.Logger
-	db  *db.DB
+	db  db.Storage
 }
 
 type DomainIFace interface {

@@ -1,20 +1,31 @@
 package db
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"os"
 
+	"github.com/1ef7yy/brand_scout/internal/models"
 	"github.com/1ef7yy/brand_scout/pkg/logger"
 	_ "github.com/lib/pq" // for postgres driver
 )
+
+type Storage interface {
+	CreateQuote(ctx context.Context, req models.CreateQuoteDTO) (models.Quote, error)
+	GetAllQuotes(ctx context.Context) ([]models.Quote, error)
+	GetAuthorQuotes(ctx context.Context, author string) ([]models.Quote, error)
+	GetRandomQuote(ctx context.Context) (models.Quote, error)
+	DeleteQuoteByID(ctx context.Context, id string) (string, error)
+	Init() error
+}
 
 type DB struct {
 	log logger.Logger
 	db  *sql.DB
 }
 
-func New(log logger.Logger) (*DB, error) {
+func New(log logger.Logger) (Storage, error) {
 	postgresConn, ok := os.LookupEnv("POSTGRES_CONN")
 
 	if !ok {
