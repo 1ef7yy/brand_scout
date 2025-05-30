@@ -76,7 +76,6 @@ func (d *DB) GetAuthorQuotes(ctx context.Context, author string) ([]models.Quote
 	return quotes, nil
 }
 
-
 func (d *DB) GetRandomQuote(ctx context.Context) (models.Quote, error) {
 	query := `
 	SELECT id, text, author FROM quotes ORDER BY RANDOM() LIMIT 1
@@ -99,7 +98,6 @@ func (d *DB) GetRandomQuote(ctx context.Context) (models.Quote, error) {
 	return quote, nil
 }
 
-
 func (d *DB) DeleteQuoteByID(ctx context.Context, id string) (string, error) {
 	query := `
 	DELETE FROM quotes
@@ -109,7 +107,6 @@ func (d *DB) DeleteQuoteByID(ctx context.Context, id string) (string, error) {
 
 	var deletedID string
 	err := d.db.QueryRowContext(ctx, query, id).Scan(&deletedID)
-
 
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {

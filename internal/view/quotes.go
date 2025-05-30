@@ -118,7 +118,6 @@ func (v *View) DeleteQuoteByID(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := json.Marshal(deletedID)
 
-
 	if err != nil {
 		v.log.Errorf("error deleting quote by id %s: %s", id, err.Error())
 		w.WriteHeader(http.StatusInternalServerError)

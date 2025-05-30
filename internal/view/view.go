@@ -26,7 +26,7 @@ func NewView(log logger.Logger) (ViewIFace, error) {
 		return nil, err
 	}
 	return &View{
-		log: log,
+		log:    log,
 		domain: domain,
 	}, nil
 }

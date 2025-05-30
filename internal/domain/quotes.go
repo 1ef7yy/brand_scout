@@ -36,7 +36,6 @@ func (d *Domain) GetQuotes(ctx context.Context, author string) ([]models.Quote, 
 func (d *Domain) GetRandomQuote(ctx context.Context) (models.Quote, error) {
 	quote, err := d.db.GetRandomQuote(ctx)
 
-
 	if err != nil {
 		d.log.Errorf("error getting random quote: %s", err.Error())
 	}
