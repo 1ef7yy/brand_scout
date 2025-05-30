@@ -20,9 +20,7 @@ func main() {
 	}
 
 	mux := routes.InitHandlers(view)
-	mux.HandleFunc("GET /test", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Simple test working!"))
-	})
+
 	serverAddr, ok := os.LookupEnv("SERVER_ADDRESS")
 
 	if !ok {
