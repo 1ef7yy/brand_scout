@@ -11,7 +11,7 @@ import (
 )
 
 func (d *DB) CreateQuote(ctx context.Context, req models.CreateQuoteDTO) (models.Quote, error) {
-	res, err := d.db.QueryContext(ctx, "INSERT INTO quotes(text, author) VALUES ($1, $2) RETURNING id, text, author", req.Text, req.Author)
+	res, err := d.db.QueryContext(ctx, "INSERT INTO quotes(text, author) VALUES ($1, $2) RETURNING id, text, author", req.Quote, req.Author)
 
 	if err != nil {
 		d.log.Errorf("error creating quote: %s", err.Error())
@@ -23,7 +23,7 @@ func (d *DB) CreateQuote(ctx context.Context, req models.CreateQuoteDTO) (models
 	var quote models.Quote
 
 	if res.Next() {
-		err = res.Scan(&quote.ID, &quote.Text, &quote.Author)
+		err = res.Scan(&quote.ID, &quote.Quote, &quote.Author)
 		if err != nil {
 			d.log.Errorf("error scanning into struct: %s", err.Error())
 			return models.Quote{}, err
@@ -44,7 +44,7 @@ func (d *DB) GetAllQuotes(ctx context.Context) ([]models.Quote, error) {
 
 	for res.Next() {
 		var quote models.Quote
-		err = res.Scan(&quote.ID, &quote.Author, &quote.Text)
+		err = res.Scan(&quote.ID, &quote.Author, &quote.Quote)
 		if err != nil {
 			return nil, err
 		}
@@ -66,7 +66,7 @@ func (d *DB) GetAuthorQuotes(ctx context.Context, author string) ([]models.Quote
 
 	for res.Next() {
 		var quote models.Quote
-		err = res.Scan(&quote.ID, &quote.Author, &quote.Text)
+		err = res.Scan(&quote.ID, &quote.Author, &quote.Quote)
 		if err != nil {
 			return nil, err
 		}
@@ -89,7 +89,7 @@ func (d *DB) GetRandomQuote(ctx context.Context) (models.Quote, error) {
 	var quote models.Quote
 
 	if res.Next() {
-		err = res.Scan(&quote.ID, &quote.Text, &quote.Author)
+		err = res.Scan(&quote.ID, &quote.Quote, &quote.Author)
 		if err != nil {
 			return models.Quote{}, err
 		}
